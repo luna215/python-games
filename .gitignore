@@ -1,0 +1,6 @@
+# the private Python — rebuilt in seconds by the README commands
+venv/
+
+__pycache__/
+*.pyc
+.DS_Store
