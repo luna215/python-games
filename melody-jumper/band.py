@@ -1,7 +1,7 @@
 """
 Band — three instruments, three balls, one clock.
 
-Lesson 2 had one ball playing one tune. This has a ball per instrument, and
+Lesson 1 had one ball playing one tune. This has a ball per instrument, and
 they all have to stay together. That turns out to change how the whole thing is
 built.
 

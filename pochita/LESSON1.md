@@ -133,8 +133,8 @@ that habit catches more bugs than any error message will.
 ## Teacher notes
 
 **The one concept:** a variable is a number with a name, and changing it changes
-what you see. Same as notebook lesson 1 — but now it moves, which lands
-differently.
+what you see. Same idea as the first browser notebook — but now it moves, which
+lands differently.
 
 **Setup, first time only.** They need Python and pygame on the machine. From the
 `python-games` folder:
@@ -169,8 +169,13 @@ going blurry.
 
 ---
 
-## Next lesson
+## What next
 
-[Lesson 2 — The ball plays the song](../melody-jumper/LESSON2.md). Pochita moves
-because one number says so. Next time a whole *list* of numbers drives everything
-at once — where things sit, when they move, and what you hear.
+That's the whole Pochita tutorial for now — one lesson, and it's the one that
+matters: a variable is a number with a name, and changing it changes what you
+see.
+
+There's a second tutorial in [melody-jumper/](../melody-jumper/README.md), about
+music instead of animation. It starts at its own lesson 1 and doesn't assume
+you've done this one, so you can go there whenever you like. The only thing the
+two share is the setup in the [README](../README.md), which you've already done.

@@ -1,8 +1,9 @@
-# Lesson 3 — Find the notes yourself
+# Lesson 3 — The band
 
-**The fundamental:** events — code that runs when something *happens*, instead
-of running top to bottom. And a function that hands an answer back to you.
-**Time:** ~75 min. **File:** [finder.py](finder.py)
+**The fundamental:** several things running at once, all measured against one
+clock. And a list of dictionaries — the shape almost every real program uses to
+describe "a bunch of similar things".
+**Time:** ~75 min. **File:** [band.py](band.py)
 
 ---
 
@@ -11,279 +12,287 @@ of running top to bottom. And a function that hands an answer back to you.
 From the `python-games` folder:
 
 ```
-./venv/bin/python melody-jumper/finder.py
+./venv/bin/python melody-jumper/band.py
 ```
 
-Your keyboard is now a piano. Hold a key. Let go. Look at the right-hand panel.
+Four instruments, four balls, scrolling right to left past a line in the middle.
+That line is **now**. Every ball lands on it at the same moment it makes its
+sound.
 
-- **ENTER** keeps the note you just played
-- **SPACE** held is a silence — then ENTER keeps that too
-- **BACKSPACE** throws away the last note you kept
-- **Z** and **X** move down and up an octave
-- **Q** holds a low drone underneath, to compare notes against
-- **TAB** plays back what you've kept
+- **SPACE** pauses
+- **R** starts over
+- **1 2 3 4** mute an instrument
 - **ESC** quits
+
+**Watch the first twenty seconds without touching anything.** It starts with one
+low instrument on its own. Every time the tune comes round, another one joins.
+That is the piece — Grieg wrote it to creep in and end up enormous.
 
 ---
 
 ## What's actually happening
 
-### Nothing is written down while you hunt
+### Three of these are playing the same tune
 
-This is the whole design. Working out a song by ear is a *search*: try C — no.
-D — no. E — that's it. If the tool wrote down every guess, you'd spend all your
-time deleting.
+Look at the screen. The top three lanes have *identical shapes*, just at
+different heights. That's not laziness — it's what "In the Hall of the Mountain
+King" actually is. One four-bar tune, played low and quiet to start with, then
+handed up the orchestra an octave at a time until everyone is playing it at
+once.
 
-So playing a note and keeping a note are two different things. Look at the two
-places the program stores notes:
+The fourth lane, `pulse`, is the only one doing something different: rocking
+back and forth between two notes underneath everything else. That's the left
+hand of Grieg's own piano version of the piece.
 
-- `last_played` — one note. The thing you just tried. It gets thrown away the
-  moment you play something else.
-- `recorded` — a list. Everything you decided to keep.
+### Why this couldn't just be jumper.py with more balls
 
-Wrong guesses cost you nothing. That's not politeness, it's what makes the tool
-usable.
+In lesson 1, a platform's position came from the note before it — each gap was
+worked out from how long the previous note lasted. That is completely fine for
+one ball, and it falls apart the moment there are two.
 
-### The program isn't running in order any more
+Here's the actual problem. Take two instruments playing the same eight beats of
+music, one as eight short notes and one as four long ones, and ask lesson 1's
+code where each ends up:
 
-Lessons 1 and 2 ran top to bottom, sixty times a second, and you could follow
-along. This one mostly sits there doing nothing until *you* do something. Then a
-chunk of code runs, and it goes back to waiting.
+| part | after 8 beats of music, x = |
+| --- | --- |
+| eight 1-beat notes | 1704 |
+| four 2-beat notes | 852 |
 
-Those somethings are called **events**. This program cares about two:
+Same eight beats. One ends up **twice as far along** as the other. Within
+seconds one ball is off the side of the screen and the band has fallen apart.
 
-| Event | When | What it does |
-| --- | --- | --- |
-| `KEYDOWN` | the moment a key goes down | start the sound, write down the time |
-| `KEYUP` | the moment it comes back up | stop the sound, work out how long you held it |
+So this program does it differently: **position comes from time.** A note that
+starts on beat 12 is drawn at beat 12 — always, no matter what any other
+instrument is doing. Everything lines up because everything is measured against
+the same clock.
 
-You can *hear* the difference. The note starts when the key goes down and stops
-when it comes up. Two separate moments, two separate pieces of code. Nothing
-about "how long you held it" exists until the key comes back up — that number is
-made by subtracting one moment from the other.
+That is not a programming trick. It is how a real band stays together: nobody
+follows anybody, everybody follows the count.
 
-### Rounding off
+### Reading the screen
 
-Nobody holds a key for exactly one beat. Hold one down and watch the panel: the
-raw number jitters (`0.87 beats`, `0.91 beats`) while the rounded one sits
-still at `1`.
+Each instrument gets a lane. Inside its lane, high notes sit high and low notes
+sit low — same idea as lesson 1, just four of them stacked.
 
-That's **quantizing** — snapping a messy measurement to the nearest tidy value.
-Every music program you have ever used does this, and it is the only reason
-anything you record lines up.
+The **width** of a pad is how long the note lasts. Most of this tune is short
+notes, so most pads are narrow bricks, with a wider one at the end of each
+phrase.
 
----
+The faint vertical lines are beats. The brighter ones are **bars** — every four
+beats — with the chord name above. The bass sits on `Bm` for three bars and
+moves to `D` for the fourth, which is why the pulse lane jumps up at the end of
+every cycle.
 
-## How to actually work out a song
+Hollow pads are notes that are *not being played* — either an instrument hasn't
+joined yet, or you've muted it. You can see what it would have played.
 
-The order below is what musicians actually do. Doing it out of order is what
-makes it feel impossible.
+### A list of dictionaries
 
-**1. Find the home note first.** Hum the song and let it end. That last note,
-the one that feels finished, is home. Hunt for *that* note before any other.
-Then set `DRONE_NOTE` to it and press **Q** — now it's playing underneath, and
-every other note either fits against it or clashes. Judging "does this fit?" is
-far easier than "what note is this?"
+Look at `PARTS`. It's a list, and every item is a `{...}` block with the same
+four labels: a `name`, a `voice`, a `color`, and a `melody`.
 
-**2. Do the rhythm before the pitch.** Tap the tune on the desk. Which notes are
-long, which are short? Get that in your head before you hunt for a single pitch.
-Trying to solve rhythm and pitch at the same time is the thing that makes people
-give up.
+```python
+{
+    "name": "low",
+    "voice": "heavy",
+    "color": (176, 138, 255),
+    "melody": [("B2", 0.5), ("C#3", 0.5), ...],
+},
+```
 
-**3. Hum it, then hunt for it.** Sing the note out loud first. *Then* go looking
-for it. If you skip the humming and just mash keys until something matches, you
-haven't used your ear at all — you've used the computer's.
+A **dictionary** stores things by name instead of by position. `part["voice"]`
+means "the voice of this part". You don't have to remember that the voice is the
+second thing — you just ask for it by name.
 
-**4. Work in short phrases.** Six to ten notes. Press **TAB** every couple of
-notes to hear what you have. Catching a wrong note when there are three is easy.
-Catching it when there are twenty is not.
+This is the shape you will meet over and over: a list of dictionaries, all with
+the same labels, one per thing. Rows in a spreadsheet. Contacts in a phone.
+Enemies in a game.
 
-**5. Looking the notes up is allowed.** Find a piano tutorial for the song on
-YouTube and read the notes off it. This is what real musicians do constantly.
-Use your ear for the rhythm and your eyes for the pitches if that's what gets it
-done — it still counts.
-
-**If the whole thing sounds right but too high or too low,** you got the tune
-right and the octave wrong. That's the single most common mistake. Press Z, and
-do it again one octave down.
+The program never mentions "low" or "pulse" anywhere in the machinery. It just
+loops over `PARTS` and does the same thing to each one. **Add a fifth dictionary
+and a fifth instrument appears** — no other change needed.
 
 ---
 
 ## Challenges
 
-Find `on_note_played` at the top of the file. It runs once, each time you press
-ENTER, and whatever it hands back is what goes into your song.
+`is_playing` runs at the start of every bar, once per instrument. Return `True`
+and it plays; return `False` and it goes quiet.
 
-**1. Every note the same length.**
+Unlike the other lessons, this function **already has real code in it** — the
+staggered entrance you heard when you ran it. So the first challenge is to take
+it away.
 
-```python
-    return (note_name, 1)
-```
+Numbers below are notes played in the first 28 seconds, which is about 16 bars.
 
-Play notes of wildly different lengths and keep them. They all come out as `1`.
-The length you held is still measured and still passed in — this function just
-ignores it and hands back something else.
-
-**2. Keep nothing.**
+**1. Everybody in from the start.** Delete the whole body and put:
 
 ```python
-    return None
+    return True
 ```
 
-Play a note. Press ENTER. Watch the status line: *"on_note_played() returned
-None — D4 not kept"*. Nothing is broken. `None` is Python's way of saying "no
-answer", and the machinery is written to take that as "don't keep this one".
+| part | as shipped | with `return True` |
+| --- | --- | --- |
+| low | 105 | 105 |
+| mid | 53 | 105 |
+| high | 27 | 105 |
+| pulse | 49 | 65 |
 
-**3. Half speed.**
+Now listen. It's *worse*. Everything arrives at once, it's the same volume from
+the first second to the last, and it stops being creepy. The build wasn't
+decoration — it was most of the effect. Put the original code back.
+
+**2. Drop the top line.**
 
 ```python
-    return (note_name, held_beats * 2)
+    return part_name != "high"
 ```
 
-Every note lasts twice as long. Record a few and press TAB.
+`high` goes to 0 notes, everything else carries on. The `"solo"` voice is the
+piercing one, so this is the difference between menacing and shrieking.
 
-**4. Ignore quick taps.** This one is genuinely useful:
+**3. Every other bar.**
 
 ```python
-    if held_beats < 1:
-        return None
-    return (note_name, held_beats)
+    if part_name == "pulse":
+        return bar_number % 2 == 0
+    return True
 ```
 
-Now short taps are thrown away and only notes you deliberately held get kept.
-Two lines, and the tool behaves differently.
+Pulse: 65 notes → 33. `%` gives the remainder after dividing, so
+`bar_number % 2 == 0` is true on bars 0, 2, 4, 6 and false on the odd ones.
 
-**5. Change the voice.** `VOICE = "bell"`. Then `"solo"`. Then `"searing"`.
-Hunting for notes is much easier with a clean sound than a distorted one — but
-`"solo"` is more fun.
+**4. The drop.**
+
+```python
+    return bar_number % 8 < 6
+```
+
+Everything plays for six bars, then everything stops for two, then it all comes
+back — 105 notes each becomes 79. This is the single most-used trick in modern
+music and it is one line of arithmetic.
+
+**5. Make it run.** `TEMPO` ships at `138`, which is what Grieg wrote at the
+*start* of the piece. It gets faster all the way through. Try `180`. Then `220`.
+Then `300`, which is past the point where you can still hear the notes as
+separate things.
+
+**6. Swap the voices.** Give `low` the `"searing"` voice. Give `high` the
+`"bell"`. The notes never change and it stops being the same piece.
 
 ---
 
-## Your turn — get eight notes
+## Your turn — add a fifth instrument
 
-Pick a song you can already hum. Work out **eight notes of it**. Not the whole
-song — eight notes.
+Copy one of the blocks in `PARTS`, paste it at the end, and change the four
+labels. Something like this, which holds long notes under everything else:
 
-That's the assignment, and finishing it means the tool worked.
-
-When you have them, quit with ESC. Two things happen:
-
-1. The notes are already saved into `my_song.py`, right next to `jumper.py`
-2. The same list gets printed in the terminal, ready to paste anywhere
-
-Now run the jumper:
-
-```
-./venv/bin/python melody-jumper/jumper.py
+```python
+    {
+        "name": "drone",
+        "voice": "moog",
+        "color": (255, 140, 190),
+        "melody": [("B1", 4), ("B1", 4), ("B1", 4), ("D2", 4)],
+    },
 ```
 
-It plays **your** song. The platforms are the shape of the tune you just worked
-out by ear. The title in the corner says `my_song.py` so you know where it came
-from.
+Run it. A fifth lane appears, the other four shrink to make room, and key **5**
+now mutes it. You didn't touch the machinery once.
 
-To go back to the built-in song, delete `my_song.py`, or set
-`USE_MY_SONG = False` in `jumper.py`.
+Then add it to `is_playing` so it joins at some point:
+
+```python
+    if part_name == "drone":
+        return bar_number >= 2
+```
+
+**Your part does not have to be the same length as the others.** The tune is 16
+beats; try making yours 6. Nothing breaks — the loops just come back around at
+different times, and since every part is nailed to the same clock, none of them
+drifts. Loops of 32, 12 and 6 beats stay in time indefinitely.
+
+**Notes that will fit**, because the piece is in B minor:
+
+```
+B  C#  D  E  F#  G  A
+```
+
+in any octave — `B2`, `F#3`, `D4`. Add `F` and `C` if you want the creepy sound
+from bar 2 of the tune; those two are deliberately outside the key, which is the
+entire reason that bar sounds wrong in a good way.
 
 ---
 
 ## Break it on purpose
 
-**These stop the program and tell you what you did:**
+**These stop the program and tell you which instrument the problem is in:**
 
-1. Make `on_note_played` end with `return "hello"`.
-2. Make it return three things: `return (note_name, held_beats, 5)`.
-3. Make it return a length of zero: `return (note_name, 0)`.
-4. Make it return words for the length: `return (note_name, "long")`.
-5. Set `VOICE = "trumpet"`.
-6. Set `DRONE_NOTE = "H2"`.
+1. Change a note in `low` to `("H4", 0.5)`.
+2. Change a note in `mid` to `("C", 1)` — no octave number.
+3. Give a note a length of `0`.
+4. Give a part `"voice": "trumpet"`.
+5. Delete the `"color"` line from one of the parts.
+6. Replace a whole part's melody with `[("-", 4)]` — nothing but rests.
+7. Make `is_playing` end with `return "yes"` instead of `True` or `False`.
 
-Every one of those tells you which line to look at. That is not normal — most
-programs would give you a screenful of red text about something else entirely.
-Somebody had to sit down and write each of those messages, guessing what you
-were likely to get wrong.
-
-**This one says nothing at all:**
-
-7. Set `TEMPO = 300` and record a few notes at your normal speed.
-
-No error, but look at what comes out. At 300 bpm a beat is only a fifth of a
-second, so everything you play measures as far more beats than you meant:
-
-| you hold for | at 92 bpm | at 300 bpm |
-| --- | --- | --- |
-| 0.3s | 0.5 | 1.5 |
-| 0.5s | 1 | 2.5 |
-| 0.65s | 1 | 3 |
-| 0.8s | 1 | 4 |
-| 1.3s | 2 | 4 |
-| 2.0s | 3 | 4 |
-
-Short notes get stretched. And anything you hold for longer than about
-0.8 seconds comes out as `4` — because the machinery quietly refuses to record
-anything longer than four beats, so all your long notes collapse into the same
-value and stop being different from each other.
-
-Nothing warned you. **Set `TEMPO` roughly to the speed of your song before you
-start recording**, not after.
+Notice that most of those messages name the part: *"In the part 'low': I don't
+understand the note 'H4'."* With one instrument you could guess where a problem
+was. With five you can't, so the machinery tells you.
 
 ---
 
 ## Teacher notes
 
-**The one concept:** events. Code that waits for something to happen instead of
-running straight through. Everything with a screen works this way, and this is
-the first lesson where the program is idle until she acts.
+**The one concept:** independent things sharing a single source of truth. This
+is the first program where "what time is it?" is answered in exactly one place
+and everything else is derived from it — and it's much easier to teach because
+the alternative *visibly fails*.
 
-**The second concept, quietly:** a function that *returns* a value rather than
-one that changes something. `on_note_played` hands an answer back; the machinery
-decides what to do with it. This matters because the next step — her writing a
-call site herself — is much easier from here.
+**Show the failure first if you have time.** Put two parts in with different
+rhythms on lesson 1's layout and watch one ball leave the other behind. The
+1704-vs-852 table above is that experiment as numbers.
 
-**No new setup.** Same venv, same one dependency. All three programs now share
-`tones.py`, which is the first time she'll see one file importing another.
+**Challenge 1 is the important one** and it's backwards from the usual shape:
+she deletes working code and the result is worse. Ask her to predict what
+`return True` will do before she runs it. Almost everyone expects "fuller, so
+better", and it isn't.
+
+**On dictionaries.** Resist explaining the syntax up front. Have her add a fifth
+part by copying a block first, see it work, and *then* ask what `part["voice"]`
+means. The shape teaches itself faster from a working copy-paste than from a
+definition.
+
+**Startup takes about a second** here — 31 separate sounds, because it builds
+one per pitch *per voice*, and four instruments across three octaves adds up.
+The progress bar is there for that reason.
 
 **Expect these:**
 
-- *Octave errors.* Very common and not a sign of a bad ear — low fundamentals
-  genuinely fool everyone. Z and X fix it in one keypress.
-- *Wanting to record every guess.* If she asks "why didn't that get saved?",
-  that's the design working. Point at `last_played` and `recorded` side by side.
-- *Rhythm before pitch.* If she's struggling, it's almost always because she's
-  solving both at once. Have her tap the rhythm on the desk first.
-- *The `TEMPO = 300` clamp.* Worth doing on purpose. It's the same family of
-  silent failure as `SIZE = 5.5` in lesson 1 — the program keeps working and
-  quietly gives you something wrong.
-- *Budget the last 15 minutes for running the jumper.* The payoff of this lesson
-  is watching the ball jump her own song. If she leaves before that happens, the
-  session reads as busywork.
+- *Impatience during the build.* It takes 21 seconds before all four are
+  playing. That's deliberate and it's the piece, but say so, or it reads as
+  broken.
+- *Wanting more instruments than fit.* Five is comfortable, six is cramped. Lane
+  height is the play area divided by the number of parts.
+- *Notes outside B minor.* They'll sound wrong — except `F` and `C`, which sound
+  wrong *on purpose* and are already in the tune. That distinction is worth
+  drawing out: Grieg broke the rule deliberately, and knowing which rule he broke
+  is the difference between a mistake and a choice.
 
-**Set the bar at eight notes, not at a finished song.** And say out loud that
-looking pitches up is what real people do — otherwise reaching for help reads as
-failure to her, and she'll stop.
+**About the music.** The notes are Grieg's, taken off the score rather than
+approximated — five independent published sources agree on them, including the
+LilyPond source of his own piano arrangement. Bar 2 is the part everyone gets
+wrong when they try to work it out by ear, so if she attempts it in `finder.py`,
+expect that bar to be the hard one.
 
-**On choosing her song.** The built-in tune in `jumper.py` and `band.py` is
-Grieg's "In the Hall of the Mountain King", because it's out of copyright and its
-notes are therefore actually published — five independent sources agree on them.
-Almost no current song is like that. Pop melodies are rarely written down
-anywhere you can check, which is the real reason this lesson exists: if she wants
-a song from this decade in her program, working it out by ear is not a shortcut,
-it's the only route.
-
-Worth saying out loud to her: transcribing a song for your own learning is
-completely normal practice, and publishing the result is a different question.
-That is a genuinely interesting ten minutes of conversation rather than a
-warning.
-
-If she picks something with an awkward range, the octave keys (Z and X) matter
-more than usual — start by finding the *lowest* note in her phrase and putting
-that on the left of the keyboard.
-
-**End of session:** screenshot into `progress/`, and keep `my_song.py`.
+**End of session:** screenshot into `progress/`, and keep her fifth part.
 
 ---
 
-## Next lesson
+## Where this could go next
 
-[Lesson 4 — The band](LESSON4.md). One ball playing one tune becomes three
-instruments playing at once, which turns out to break the way lesson 2 placed
-its platforms — and fixing it is the lesson.
+The obvious ones, roughly in order of difficulty: percussion (a part where pitch
+doesn't matter and rhythm does), a part built by `finder.py` dropped straight
+in, making `TEMPO` speed up as the piece goes so it actually accelerates like the
+real one, and letting `is_playing` look at what the *other* instruments are doing
+rather than just the bar number.

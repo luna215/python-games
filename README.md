@@ -1,10 +1,14 @@
 # python-games
 
-Python projects for Evolett. Each one opens a window with something moving in
-it, and each one has a card telling you what to change and what to look for.
+Python tutorials for Evolett. Each one opens a window with something moving in
+it, and each lesson has a card telling you what to change and what to look for.
+
+There are **two tutorials, and they're independent** — separate subjects, each
+starting at its own lesson 1. Do them in either order, or only one. They share
+nothing except the setup below.
 
 Everything runs on your own computer. Nothing to sign up for, no website, and
-after the one-time setup below, no internet needed either.
+after the one-time setup, no internet needed either.
 
 ---
 
@@ -43,46 +47,44 @@ troubleshooting entry below.
 
 ---
 
-## The lessons
+## The two tutorials
 
 **Run everything from this folder**, not from inside `pochita/` or
 `melody-jumper/`.
 
+### [Pochita](pochita/) — animation
+
+One lesson. Pochita walks across the screen, and you find out that nothing is
+moving: there are four drawings and some arithmetic.
+
 | | Lesson | What it's really about | Time |
 |---|---|---|---|
 | **1** | [Pochita goes for a walk](pochita/LESSON1.md) | variables, and the fact that animation is just pictures swapped quickly | ~60 min |
-| **2** | [The ball plays the song](melody-jumper/LESSON2.md) | a list of data driving everything you see *and* hear | ~75 min |
-| **3** | [Find the notes yourself](melody-jumper/LESSON3.md) | events — code that runs when something *happens* — and functions that hand back an answer | ~75 min |
-| **4** | [The band](melody-jumper/LESSON4.md) | several things running at once against one clock, and lists of dictionaries | ~75 min |
 
 ```
 ./venv/bin/python pochita/lesson1.py
+```
+
+### [Melody Jumper](melody-jumper/) — music
+
+Three lessons. A ball bounces along platforms and plays a note on each landing.
+By the end you've taught it a song you worked out by ear, and put four
+instruments on screen playing together.
+
+| | Lesson | What it's really about | Time |
+|---|---|---|---|
+| **1** | [The ball plays the song](melody-jumper/LESSON1.md) | a list of data driving everything you see *and* hear | ~75 min |
+| **2** | [Find the notes yourself](melody-jumper/LESSON2.md) | events — code that runs when something *happens* — and functions that hand back an answer | ~75 min |
+| **3** | [The band](melody-jumper/LESSON3.md) | several things running at once against one clock, and lists of dictionaries | ~75 min |
+
+```
 ./venv/bin/python melody-jumper/jumper.py
 ./venv/bin/python melody-jumper/finder.py
 ./venv/bin/python melody-jumper/band.py
 ```
 
-### How lessons 2, 3 and 4 fit together
-
-They're one project seen three ways, and they share a single sound engine
-(`tones.py`), so a change there changes all of them.
-
-```
-   finder.py  ──writes──▶  my_song.py  ──played by──▶  jumper.py
-   (lesson 3)                                          (lesson 2)
-
-   band.py    same tune, four instruments at once
-   (lesson 4)
-```
-
-Lesson 2 plays one tune with one ball. Lesson 3 gives you a keyboard to hunt for
-notes on, and saves whatever you work out into `my_song.py` — which lesson 2
-then plays instead of its own tune, automatically. Lesson 4 puts four
-instruments on screen together.
-
-The order matters less than you'd think. If typing note names into a list in
-lesson 2 starts to feel tedious, that tedium is exactly why lesson 3 exists — go
-and do it, then come back.
+Those three do connect to each other — lesson 2 writes a song file that lesson 1
+plays — which is explained in the [Melody Jumper README](melody-jumper/README.md).
 
 ---
 
@@ -101,7 +103,8 @@ and do it, then come back.
 
 ## How a lesson works
 
-Read the lesson card first, then open the `.py` file next to it.
+Both tutorials follow the same shape. Read the lesson card first, then open the
+`.py` file next to it.
 
 Every program is split in two. Everything you're meant to change sits at the top
 under **YOUR CODE** — numbers, colours, the song, and one function with your name
@@ -131,7 +134,7 @@ what picks it.
 
 **`can't open file … [Errno 2] No such file or directory`**
 
-You're in the wrong folder — probably inside a lesson folder instead of this
+You're in the wrong folder — probably inside a tutorial folder instead of this
 one. Run `pwd`; it should end in `python-games`. All the paths above start from
 here.
 
@@ -154,83 +157,37 @@ everyone about four times and then never again.
 It's behind your other windows, or waiting in the Dock. Click the Python icon
 there.
 
-**`Can't find the 'sprites' folder`**
-
-`lesson1.py` and the `sprites` folder have to sit next to each other inside
-`pochita/`. If you moved one, put it back.
-
-**There's no sound**
-
-Check your volume and that nothing else has taken over the audio output. There
-are no sound files to be missing — every note is built by the program when it
-starts. You'll see a "building the sounds" bar while that happens: about a fifth
-of a second for `jumper.py`, and a second or so for `band.py`, which builds 31
-separate sounds because it needs one per pitch *per instrument*.
-
-**The jumper is playing a different song than I expected**
-
-If `my_song.py` exists, `jumper.py` plays that instead of its built-in tune, and
-the corner of the window says `my_song.py` so you can tell. Delete that file to
-go back, or set `USE_MY_SONG = False` at the top of `jumper.py`.
-
-**The band takes ages before it sounds like anything**
-
-That's deliberate. It starts with one instrument and adds another every four
-bars, so all four are only playing after about 21 seconds. Look at `is_playing`
-at the top of `band.py` — that's the function doing it.
+Problems specific to one tutorial — missing sprites, no sound, the band's slow
+start — are in that tutorial's own README:
+[Pochita](pochita/README.md) · [Melody Jumper](melody-jumper/README.md).
 
 ---
 
 ## What's in here
 
 ```
-pochita/            lesson 1
-  lesson1.py
+pochita/            tutorial 1 — animation
+  README.md
   LESSON1.md
+  lesson1.py
   sprites/          18 files of Pochita artwork
 
-melody-jumper/      lessons 2, 3 and 4 — everything to do with music
-  jumper.py         lesson 2: one ball, one tune
-  LESSON2.md
-  finder.py         lesson 3: work out a song by ear
-  LESSON3.md
-  band.py           lesson 4: four instruments at once
-  LESSON4.md
+melody-jumper/      tutorial 2 — music
+  README.md
+  LESSON1.md        the ball plays the song
+  jumper.py
+  LESSON2.md        find the notes yourself
+  finder.py
+  LESSON3.md        the band
+  band.py
   tones.py          the sound engine, shared by all three
   my_song.py        not there yet — finder.py creates it
 
 requirements.txt    what to install (just pygame-ce)
 ```
 
-Inside `pochita/sprites/`:
-
-- **`pochita_left_1..4.png`** and **`pochita_right_1..4.png`** — the eight
-  drawings that make up the walk cycle. 45 pixels wide. Open one and you'll see
-  the whole trick.
-- **`pochita.svg`** — a still of him as vector art, so it stays sharp at any size.
-- **`pochita-walk-*.svg`** — the same walk frames in vector form.
-- **`pochita-reference.png`** — the original picture the sprites were traced from.
-
-`melody-jumper/` has no asset files at all. Every note you hear is arithmetic,
-worked out in `tones.py` when the program starts.
-
----
-
-## About the music
-
-The tune that comes with lessons 2 and 4 is **"In the Hall of the Mountain
-King"**, written by Edvard Grieg in 1875. You've heard it — it's the creeping,
-speeding-up one.
-
-Those are Grieg's actual notes, taken off the score. Grieg died in 1907, so the
-music belongs to everybody now, which is why they can be printed in a file here
-rather than approximated.
-
-That's also the honest reason it isn't a current song. Modern pop melodies are
-almost never written down anywhere you can check, so anything claiming to be one
-would be a guess. Working a song out by ear is the real way to get one — which
-is the whole point of lesson 3, and why `jumper.py` will happily play whatever
-Evolett finds instead.
+`pochita/` has artwork; `melody-jumper/` has no asset files at all, because every
+note it plays is arithmetic worked out when the program starts.
 
 ---
 

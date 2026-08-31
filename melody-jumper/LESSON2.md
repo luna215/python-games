@@ -1,8 +1,8 @@
-# Lesson 2 — The ball plays the song
+# Lesson 2 — Find the notes yourself
 
-**The fundamental:** a list of data can *be* the program. Change the list, and
-everything the program does changes with it.
-**Time:** ~75 min. **File:** [jumper.py](jumper.py)
+**The fundamental:** events — code that runs when something *happens*, instead
+of running top to bottom. And a function that hands an answer back to you.
+**Time:** ~75 min. **File:** [finder.py](finder.py)
 
 ---
 
@@ -11,231 +11,178 @@ everything the program does changes with it.
 From the `python-games` folder:
 
 ```
-./venv/bin/python melody-jumper/jumper.py
+./venv/bin/python melody-jumper/finder.py
 ```
 
-A window opens. A ball jumps from platform to platform on its own, and plays a
-note every time it lands.
+Your keyboard is now a piano. Hold a key. Let go. Look at the right-hand panel.
 
-- **SPACE** pauses it
-- **R** starts the song over
+- **ENTER** keeps the note you just played
+- **SPACE** held is a silence — then ENTER keeps that too
+- **BACKSPACE** throws away the last note you kept
+- **Z** and **X** move down and up an octave
+- **Q** holds a low drone underneath, to compare notes against
+- **TAB** plays back what you've kept
 - **ESC** quits
 
 ---
 
 ## What's actually happening
 
-Nobody placed those platforms. Look at the top of `jumper.py`:
+### Nothing is written down while you hunt
 
-```python
-MELODY = [
-    ("B3", 0.5), ("C#4", 0.5), ("D4", 0.5), ("E4", 0.5), ("F#4", 0.5), ...
-    ("F4", 0.5), ("C#4", 0.5), ("F4", 1),   ("E4", 0.5), ("C4", 0.5),  ...
-    ...
-]
-```
+This is the whole design. Working out a song by ear is a *search*: try C — no.
+D — no. E — that's it. If the tool wrote down every guess, you'd spend all your
+time deleting.
 
-That's the whole song, and it is also the whole level. Each line becomes one
-platform:
+So playing a note and keeping a note are two different things. Look at the two
+places the program stores notes:
 
-- the **note name** decides how high up the screen the platform floats
-- the **number** is how many beats the note lasts, which decides how long the
-  ball sits there before it jumps again
+- `last_played` — one note. The thing you just tried. It gets thrown away the
+  moment you play something else.
+- `recorded` — a list. Everything you decided to keep.
 
-So the shape you see on screen *is* the shape of the melody. When the tune goes
-up, the platforms go up. Pause it with SPACE and look — you can read the song off
-the screen without hearing a thing.
+Wrong guesses cost you nothing. That's not politeness, it's what makes the tool
+usable.
 
-There is no sound file anywhere in this folder. The computer builds every note
-from scratch when the program starts, by working out tens of thousands of numbers
-that describe how fast the air should shake. That happens in `tones.py`, a
-separate file this one borrows from — which is what the line `import tones` at
-the top is doing.
+### The program isn't running in order any more
 
-The tune it comes with is **"In the Hall of the Mountain King"**, written by
-Edvard Grieg in 1875 for a play called *Peer Gynt*. You have heard it. It's the
-creeping, speeding-up one that gets used every time something is sneaking up on
-somebody.
+Lesson 1 ran top to bottom, sixty times a second, and you could follow along.
+This one mostly sits there doing nothing until *you* do something. Then a chunk
+of code runs, and it goes back to waiting.
 
-Grieg died in 1907, so nobody owns this music any more — which means the notes in
-`MELODY` are the real ones off the score, not an imitation. Four bars, in B minor,
-at the tempo Grieg wrote on it: 138 beats per minute.
+Those somethings are called **events**. This program cares about two:
 
-**Look at bar 2** — the second line of `MELODY`. Every other bar uses notes from
-B minor. That one uses `F` and `C`, which are not in the key at all, and that is
-exactly why the piece sounds creepy. It's the same three-note shape played twice,
-the second time one semitone lower. Grieg wrote that `F` as "E sharp", which is
-the same key on a piano and tells a musician something about where the note is
-going.
+| Event | When | What it does |
+| --- | --- | --- |
+| `KEYDOWN` | the moment a key goes down | start the sound, write down the time |
+| `KEYUP` | the moment it comes back up | stop the sound, work out how long you held it |
 
-### Reading a note name
+You can *hear* the difference. The note starts when the key goes down and stops
+when it comes up. Two separate moments, two separate pieces of code. Nothing
+about "how long you held it" exists until the key comes back up — that number is
+made by subtracting one moment from the other.
 
-A note name is a **letter**, then an optional `#` or `b`, then an **octave
-number**.
+### Rounding off
 
-| You write | It means |
-| --- | --- |
-| `C4` | middle C |
-| `C5` | one octave higher — same note, but higher |
-| `C3` | one octave lower |
-| `F#4` | F sharp, the black key just above F |
-| `Bb4` | B flat, the black key just below B |
-| `-` | a rest. The ball still lands, but no sound comes out. |
+Nobody holds a key for exactly one beat. Hold one down and watch the panel: the
+raw number jitters (`0.87 beats`, `0.91 beats`) while the rounded one sits
+still at `1`.
 
-The rests are the hollow platforms.
+That's **quantizing** — snapping a messy measurement to the nearest tidy value.
+Every music program you have ever used does this, and it is the only reason
+anything you record lines up.
+
+---
+
+## How to actually work out a song
+
+The order below is what musicians actually do. Doing it out of order is what
+makes it feel impossible.
+
+**1. Find the home note first.** Hum the song and let it end. That last note,
+the one that feels finished, is home. Hunt for *that* note before any other.
+Then set `DRONE_NOTE` to it and press **Q** — now it's playing underneath, and
+every other note either fits against it or clashes. Judging "does this fit?" is
+far easier than "what note is this?"
+
+**2. Do the rhythm before the pitch.** Tap the tune on the desk. Which notes are
+long, which are short? Get that in your head before you hunt for a single pitch.
+Trying to solve rhythm and pitch at the same time is the thing that makes people
+give up.
+
+**3. Hum it, then hunt for it.** Sing the note out loud first. *Then* go looking
+for it. If you skip the humming and just mash keys until something matches, you
+haven't used your ear at all — you've used the computer's.
+
+**4. Work in short phrases.** Six to ten notes. Press **TAB** every couple of
+notes to hear what you have. Catching a wrong note when there are three is easy.
+Catching it when there are twenty is not.
+
+**5. Looking the notes up is allowed.** Find a piano tutorial for the song on
+YouTube and read the notes off it. This is what real musicians do constantly.
+Use your ear for the rhythm and your eyes for the pitches if that's what gets it
+done — it still counts.
+
+**If the whole thing sounds right but too high or too low,** you got the tune
+right and the octave wrong. That's the single most common mistake. Press Z, and
+do it again one octave down.
 
 ---
 
 ## Challenges
 
-**1. Flatten it.** Find `platform_height` and replace its last two lines with:
+Find `on_note_played` at the top of the file. It runs once, each time you press
+ENTER, and whatever it hands back is what goes into your song.
+
+**1. Every note the same length.**
 
 ```python
-    return 0.5
+    return (note_name, 1)
 ```
 
-Every platform lands at the same height and the ball rolls along a flat road.
-The song sounds exactly the same. **The sound and the picture came from the same
-list, but nothing forces them to agree** — you just chose to throw the pitch
-information away.
+Play notes of wildly different lengths and keep them. They all come out as `1`.
+The length you held is still measured and still passed in — this function just
+ignores it and hands back something else.
 
-**2. Upside down.**
+**2. Keep nothing.**
 
 ```python
-    return 1 - (note - lowest) / span
+    return None
 ```
 
-Now high notes sink and low notes climb. Confusing to watch, which is the point:
-your brain already expected higher notes to be higher up, and nobody taught it
-that.
+Play a note. Press ENTER. Watch the status line: *"on_note_played() returned
+None — D4 not kept"*. Nothing is broken. `None` is Python's way of saying "no
+answer", and the machinery is written to take that as "don't keep this one".
 
-**3. Only the peaks.**
+**3. Half speed.**
 
 ```python
-    return ((note - lowest) / span) ** 3
+    return (note_name, held_beats * 2)
 ```
 
-The highest note stays right where it was. Everything else drops toward the
-floor. Cubing a number between 0 and 1 makes it much smaller unless it's already
-close to 1.
+Every note lasts twice as long. Record a few and press TAB.
 
-Put the original two lines back before moving on.
+**4. Ignore quick taps.** This one is genuinely useful:
 
-**4. Tempo.** `TEMPO` is beats per minute. It ships at `138`, which is what's
-printed on Grieg's score. Try `46`, then `220`.
+```python
+    if held_beats < 1:
+        return None
+    return (note_name, held_beats)
+```
 
-Two separate things change, and it's worth telling them apart.
+Now short taps are thrown away and only notes you deliberately held get kept.
+Two lines, and the tool behaves differently.
 
-First, **the gaps between platforms get smaller as the tempo rises**, because
-there's less time to travel:
-
-| TEMPO | gap after a half-beat note |
-| --- | --- |
-| 46 | 213 px |
-| 107 | 143 px |
-| 160 | 119 px |
-
-Second, at any one tempo, **longer notes get wider gaps**. At the shipped 138:
-
-| note length | gap |
-| --- | --- |
-| half a beat | 127 px |
-| a whole beat | 183 px |
-
-So the rhythm of the tune is visible in the spacing without hearing anything —
-the six quick steps at the start of each bar are evenly close together, then
-there's a wider jump for the long note. Pause with SPACE and read it off the
-screen.
-
-The real piece speeds up continuously from beginning to end. `220` gets you
-somewhere near the ending.
-
-**5. Gravity, and a surprise.** `GRAVITY` is in the machinery section.
-
-**Set `TEMPO = 46` first.** Then try `GRAVITY` at `900`, then `3200`. You need
-the slow tempo for this one, and the reason why is the whole point — come back to
-it in a moment.
-
-You would expect more gravity to mean flatter jumps. It does the opposite:
-
-| GRAVITY | highest point at TEMPO 46 |
-| --- | --- |
-| 900 | y = 237 |
-| 1900 (shipped) | y = 200 |
-| 3200 | y = 151 |
-
-Smaller y is higher up the screen, so more gravity really does throw the ball
-*higher*.
-
-Here's why. The ball **must** land exactly when the next note is due. So when you
-crank up gravity, the program has to throw it much harder to keep it in the air
-that long — and throwing it harder sends it higher. The landing time is fixed;
-the height is whatever falls out of that.
-
-**Now put `TEMPO` back to 138 and try the same thing.** Almost nothing happens.
-
-That's the second half of the lesson. How high the ball goes depends on how long
-it's in the air, *squared* — and at 138 bpm these notes are so short (a fifth of
-a second) that the jumps are only a few pixels high no matter what gravity says.
-Two settings you'd think were unrelated turn out to control each other.
-
-Here's why. The ball **must** land exactly when the next note is due, no matter
-what. So when you crank up gravity, the program has to throw the ball much harder
-to keep it in the air that long, and throwing it harder sends it higher. The
-landing time is fixed and the height is whatever falls out of that.
-
-**6. The sound itself.** `VOICE` picks how the notes are made. Try all seven:
-
-| | |
-| --- | --- |
-| `bell` | clean and soft |
-| `pluck` | short and woody |
-| `lead` | detuned and driven |
-| `heavy` | the same, plus an octave underneath |
-| `searing` | a square wave, distorted hard |
-| `moog` | three detuned saws that swell in, with an echo — the one it ships with |
-| `solo` | distorted, and it *slides* up into every note |
-
-Same notes, same platforms, completely different song. Listen to `bell` and then
-`solo` back to back — that difference is nothing but arithmetic, and it's all in
-`tones.py` if you want to look.
-
-**7. Colours.** `BALL_COLOR`, `PLATFORM_COLOR`, `ACTIVE_COLOR`. Three numbers
-each: red, green, blue, `0` to `255`.
+**5. Change the voice.** `VOICE = "bell"`. Then `"solo"`. Then `"searing"`.
+Hunting for notes is much easier with a clean sound than a distorted one — but
+`"solo"` is more fun.
 
 ---
 
-## Your turn — put a real song in there
+## Your turn — get eight notes
 
-This is the actual assignment. Pick a song you like and type its melody into
-`MELODY`.
+Pick a song you can already hum. Work out **eight notes of it**. Not the whole
+song — eight notes.
 
-You do not need to read music. Here's the method that works:
+That's the assignment, and finishing it means the tool worked.
 
-1. Find the song's notes. A piano app on your phone, or an online keyboard, or
-   [onlinesequencer.net](https://onlinesequencer.net). Play notes until one
-   matches the first note of the tune you're humming.
-2. Write it down as a name and a length. `("D4", 1)` — one beat.
-3. Do the next note. Then the next. Four or five notes is already enough to
-   recognise.
-4. Run it after every couple of notes. Wrong ones are obvious immediately, and
-   it's much easier to fix two notes than twenty.
+When you have them, quit with ESC. Two things happen:
 
-**Things worth knowing while you do it:**
+1. The notes are already saved into `my_song.py`, right next to `jumper.py`
+2. The same list gets printed in the terminal, ready to paste anywhere
 
-- If the whole thing sounds too high or too low, change every octave number at
-  once — all the `4`s to `3`s. The tune stays the same, it just moves down.
-- If it sounds right but feels wrong, your lengths are off, not your notes.
-  Rhythm is the half people get wrong.
-- Set `SONG_TITLE` to the name of your song so it shows in the corner.
+Now run the jumper:
 
-Melodies loop forever, so a good one is about 8 to 20 notes.
+```
+./venv/bin/python melody-jumper/jumper.py
+```
 
-**There's an easier way to do this, and it's the next lesson.**
-[finder.py](finder.py) turns your keyboard into a piano so you can hunt for the
-notes by ear and have it write the list for you. If typing note names into a file
-is annoying you right now, that annoyance is the reason lesson 3 exists — go and
-do [Lesson 3](LESSON3.md), then come back here and run this again.
+It plays **your** song. The platforms are the shape of the tune you just worked
+out by ear. The title in the corner says `my_song.py` so you know where it came
+from.
+
+To go back to the built-in song, delete `my_song.py`, or set
+`USE_MY_SONG = False` in `jumper.py`.
 
 ---
 
@@ -243,82 +190,101 @@ do [Lesson 3](LESSON3.md), then come back here and run this again.
 
 **These stop the program and tell you what you did:**
 
-1. Change a note to `("H4", 1)`. There is no note called H.
-2. Change a note to `("C", 1)` — the letter with no octave number.
-3. Give a note a length of `-1`.
-4. Delete every line of `MELODY` except one.
-5. Make `platform_height` end with `return "high"` instead of a number.
+1. Make `on_note_played` end with `return "hello"`.
+2. Make it return three things: `return (note_name, held_beats, 5)`.
+3. Make it return a length of zero: `return (note_name, 0)`.
+4. Make it return words for the length: `return (note_name, "long")`.
+5. Set `VOICE = "trumpet"`.
+6. Set `DRONE_NOTE = "H2"`.
 
-Read each message. They were written for you, on purpose. Most of the time a
-program that breaks gives you thirty lines of red text about something that
-isn't the problem.
+Every one of those tells you which line to look at. That is not normal — most
+programs would give you a screenful of red text about something else entirely.
+Somebody had to sit down and write each of those messages, guessing what you
+were likely to get wrong.
 
 **This one says nothing at all:**
 
-6. Make `platform_height` end with `return 5`.
+7. Set `TEMPO = 300` and record a few notes at your normal speed.
 
-No error. The platforms all jump to the top of the screen and stay there. The
-machinery quietly squashes anything above 1 back down to 1, because a platform
-above the top of the window is no platform at all.
+No error, but look at what comes out. At 300 bpm a beat is only a fifth of a
+second, so everything you play measures as far more beats than you meant:
 
-That's a decision somebody made, buried in code you didn't write, that changes
-what you see and never mentions it. Software is full of these.
+| you hold for | at 92 bpm | at 300 bpm |
+| --- | --- | --- |
+| 0.3s | 0.5 | 1.5 |
+| 0.5s | 1 | 2.5 |
+| 0.65s | 1 | 3 |
+| 0.8s | 1 | 4 |
+| 1.3s | 2 | 4 |
+| 2.0s | 3 | 4 |
+
+Short notes get stretched. And anything you hold for longer than about
+0.8 seconds comes out as `4` — because the machinery quietly refuses to record
+anything longer than four beats, so all your long notes collapse into the same
+value and stop being different from each other.
+
+Nothing warned you. **Set `TEMPO` roughly to the speed of your song before you
+start recording**, not after.
 
 ---
 
 ## Teacher notes
 
-**The one concept:** the program's behaviour lives in a list of data, not in the
-instructions. This is a real step up from lesson 1, where changing `SPEED`
-changed one thing. Here, changing one line of `MELODY` moves a platform, changes
-a landing time, changes a jump arc, and changes a sound.
+**The one concept:** events. Code that waits for something to happen instead of
+running straight through. Everything with a screen works this way, and this is
+the first lesson where the program is idle until she acts.
 
-**No new setup.** Same venv as lesson 1, same single dependency. The sound is
-generated in Python with the standard library — nothing to download, and it works
-with no internet.
+**The second concept, quietly:** a function that *returns* a value rather than
+one that changes something. `on_note_played` hands an answer back; the machinery
+decides what to do with it. This matters because the next step — her writing a
+call site herself — is much easier from here.
 
-**Startup takes about a fifth of a second** for this song — you may not even see
-the progress bar. It builds one sound per pitch, and how long each takes depends
-on the voice (`heavy` and `moog` are the slow ones) and on the song's longest
-note, since that sets how long the tones need to be.
+**No new setup.** Same venv, same one dependency. All three programs in this
+folder share `tones.py`, which is the first time she'll see one file importing
+another.
 
 **Expect these:**
 
-- *Challenge 1 (the flat road).* Worth pausing on. The picture and the sound come
-  from one list, and separating them makes it obvious that neither one is "the
-  real song".
-- *Challenge 5 (gravity backwards).* Genuinely counterintuitive, and the
-  explanation is the good part: the constraint is the landing time, so height is
-  the thing that has to give. If they predict "flatter" and get "higher", that
-  is the lesson working. It only shows at a slow TEMPO — at the shipped 138 the
-  notes last a fifth of a second and the arcs are a few pixels high whatever
-  gravity is set to. Make them do it both ways; "why did it stop working?" is
-  the better half of the question.
-- *Writing their own melody.* This is where the time goes and where the interest
-  is. Expect the rhythm to be wrong before the notes are. Getting four correct
-  notes of a song they actually like beats twenty notes of one they don't.
-- *"Can I use a real song?"* Yes — typing in a melody by ear for yourself is
-  fine, and it is by far the best way to spend this lesson. Note names in a text
-  file, not an audio file.
-- *Where the tune came from.* The notes in `MELODY` are Grieg's, read off the
-  score, not an approximation — the piece is out of copyright. If she asks why
-  this one and not something current: current songs mostly don't have their
-  melodies published anywhere, which is exactly the gap lesson 3 fills.
+- *Octave errors.* Very common and not a sign of a bad ear — low fundamentals
+  genuinely fool everyone. Z and X fix it in one keypress.
+- *Wanting to record every guess.* If she asks "why didn't that get saved?",
+  that's the design working. Point at `last_played` and `recorded` side by side.
+- *Rhythm before pitch.* If she's struggling, it's almost always because she's
+  solving both at once. Have her tap the rhythm on the desk first.
+- *The `TEMPO = 300` clamp.* Worth doing on purpose. It is the nastiest kind of
+  bug: the program keeps working, gives you something wrong, and never says a
+  word about it.
+- *Budget the last 15 minutes for running the jumper.* The payoff of this lesson
+  is watching the ball jump her own song. If she leaves before that happens, the
+  session reads as busywork.
 
-**If they ask how the sound is made:** every note is a list of about 60,000
-numbers, one every 1/44100th of a second, describing where a speaker cone should
-be. `tones.py` draws one cycle of a wave, then walks around it at the right
-speed. The `VOICES` table near the top is the good part to show them — each voice
-is the same machine with different dials, and the comment block above it says
-what every dial does. Change one number and re-run.
+**Set the bar at eight notes, not at a finished song.** And say out loud that
+looking pitches up is what real people do — otherwise reaching for help reads as
+failure to her, and she'll stop.
 
-**End of session:** screenshot into `progress/`, and keep their melody.
+**On choosing her song.** The built-in tune in `jumper.py` and `band.py` is
+Grieg's "In the Hall of the Mountain King", because it's out of copyright and its
+notes are therefore actually published — five independent sources agree on them.
+Almost no current song is like that. Pop melodies are rarely written down
+anywhere you can check, which is the real reason this lesson exists: if she wants
+a song from this decade in her program, working it out by ear is not a shortcut,
+it's the only route.
+
+Worth saying out loud to her: transcribing a song for your own learning is
+completely normal practice, and publishing the result is a different question.
+That is a genuinely interesting ten minutes of conversation rather than a
+warning.
+
+If she picks something with an awkward range, the octave keys (Z and X) matter
+more than usual — start by finding the *lowest* note in her phrase and putting
+that on the left of the keyboard.
+
+**End of session:** screenshot into `progress/`, and keep `my_song.py`.
 
 ---
 
 ## Next lesson
 
-[Lesson 3 — Find the notes yourself](LESSON3.md). Typing note names into a list
-is the slow way. Next lesson builds the tool that listens instead: a keyboard you
-can hunt around on until a note matches the song in your head, which then writes
-this list for you.
+[Lesson 3 — The band](LESSON3.md). One ball playing one tune becomes four
+instruments playing at once, which turns out to break the way lesson 1 placed
+its platforms — and fixing it is the lesson.
