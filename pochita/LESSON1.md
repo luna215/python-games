@@ -9,7 +9,7 @@ swapped quickly.
 ## Run it
 
 ```
-./venv/bin/python pochita-game/lesson1.py
+./venv/bin/python pochita/lesson1.py
 ```
 
 A window opens and Pochita walks across it. Press **ESC** or close the window to
@@ -137,7 +137,7 @@ what you see. Same as notebook lesson 1 — but now it moves, which lands
 differently.
 
 **Setup, first time only.** They need Python and pygame on the machine. From the
-`dev-games` folder:
+`python-games` folder:
 
 ```
 python3 -m venv venv
@@ -171,5 +171,6 @@ going blurry.
 
 ## Next lesson
 
-Pochita walks where the number tells him to. Next time **you** tell him — arrow
-keys, and he goes where you point.
+[Lesson 2 — The ball plays the song](../melody-jumper/LESSON2.md). Pochita moves
+because one number says so. Next time a whole *list* of numbers drives everything
+at once — where things sit, when they move, and what you hear.
