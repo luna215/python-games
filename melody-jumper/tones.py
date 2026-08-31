@@ -1,9 +1,9 @@
 """
-tones.py — the sound engine, shared by jumper.py and finder.py.
+tones.py — the sound engine.
 
-Both programs need to turn a note name into a sound, so that job lives here
-instead of being written twice. This is what a "module" is: code you wrote once
-and use from more than one place.
+Turning a note name into an actual sound is a big enough job that it lives in
+its own file, and jumper.py borrows it with the line `import tones`. That is
+what a "module" is: code kept somewhere separate so any program can use it.
 
 Nothing in here needs changing to do the lessons. If you're curious how a
 computer makes a sound out of nothing, read on — it's less magic than you'd

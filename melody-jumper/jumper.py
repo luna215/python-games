@@ -10,12 +10,8 @@ Run it from the python-games folder:
     ./venv/bin/python melody-jumper/jumper.py
 
 SPACE pauses.  R starts the song over.  ESC quits.
-
-If you've used finder.py to work out a song by ear, this plays that instead —
-see USE_MY_SONG below.
 """
 
-import os
 import random
 import sys
 
@@ -48,10 +44,6 @@ TEMPO = 138
 # bowed. The notes are short and fast, and a voice that rings on for two
 # seconds (try "moog") smears them into mush.
 VOICE = "pluck"
-
-# If finder.py has saved a my_song.py next to this file, play that instead of
-# the MELODY below. Set this to False to always use the built-in song.
-USE_MY_SONG = True
 
 # The song itself. Each line is ("note name", how many beats it lasts).
 #
@@ -123,11 +115,8 @@ SKY_BOTTOM = (46, 23, 44)
 REST_COLOR = (74, 72, 104)
 TEXT_COLOR = (150, 152, 190)
 
-SONG_FILE = "my_song.py"
-
-
 # ---------- notes ----------
-# The sound itself is built in tones.py, which finder.py uses too.
+# The sound itself is built in tones.py, the file this one imports at the top.
 
 def note_number(name):
     """Turn a name like 'C4' or 'F#3' into a number. '-' means silence."""
@@ -138,36 +127,6 @@ def note_number(name):
 
 
 # ---------- laying out the level ----------
-
-def load_my_song():
-    """If finder.py has written a song next to this file, play that instead."""
-    global SONG_TITLE, TEMPO, MELODY
-
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), SONG_FILE)
-    if not USE_MY_SONG or not os.path.exists(path):
-        return False
-
-    found = {}
-    try:
-        with open(path) as handle:
-            exec(compile(handle.read(), path, "exec"), found)
-    except Exception as problem:
-        raise SystemExit(
-            f"\n{SONG_FILE} has a mistake in it and Python couldn't read it:"
-            f"\n  {problem}"
-            f"\n\nFix it, or delete {SONG_FILE} to go back to the built-in song.\n"
-        )
-
-    if "MELODY" not in found:
-        raise SystemExit(
-            f"\n{SONG_FILE} doesn't have a MELODY list in it."
-            f"\nRun finder.py and press ENTER to write one properly.\n"
-        )
-
-    MELODY = found["MELODY"]
-    SONG_TITLE = found.get("SONG_TITLE", SONG_TITLE)
-    TEMPO = found.get("TEMPO", TEMPO)
-    return True
 
 
 def check_melody():
@@ -258,8 +217,6 @@ def blit_centered(screen, surf, x, y):
 
 
 def main():
-    from_file = load_my_song()
-
     if TEMPO <= 0:
         raise SystemExit("\nTEMPO has to be more than 0.\n")
     if VOICE not in tones.VOICES:
@@ -487,8 +444,7 @@ def main():
 
         screen.blit(big_font.render(SONG_TITLE, True, (226, 228, 250)), (24, 22))
         counted = f"{played} note{'' if played == 1 else 's'} played"
-        source = SONG_FILE if from_file else "built-in song"
-        screen.blit(font.render(f"{TEMPO} bpm    {VOICE}    {source}    {counted}",
+        screen.blit(font.render(f"{TEMPO} bpm    {VOICE}    {counted}",
                                 True, TEXT_COLOR), (25, 52))
         hint = "SPACE paused — press it again" if paused else "SPACE pause    R restart    ESC quit"
         screen.blit(font.render(hint, True, TEXT_COLOR), (25, HEIGHT - 34))

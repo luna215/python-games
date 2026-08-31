@@ -67,24 +67,17 @@ moving: there are four drawings and some arithmetic.
 
 ### [Melody Jumper](melody-jumper/) — music
 
-Three lessons. A ball bounces along platforms and plays a note on each landing.
-By the end you've taught it a song you worked out by ear, and put four
-instruments on screen playing together.
+One lesson. A ball bounces along platforms and plays a note on each landing. The
+platforms are built out of the song itself, so what you see on screen is the
+shape of the tune.
 
 | | Lesson | What it's really about | Time |
 |---|---|---|---|
 | **1** | [The ball plays the song](melody-jumper/LESSON1.md) | a list of data driving everything you see *and* hear | ~75 min |
-| **2** | [Find the notes yourself](melody-jumper/LESSON2.md) | events — code that runs when something *happens* — and functions that hand back an answer | ~75 min |
-| **3** | [The band](melody-jumper/LESSON3.md) | several things running at once against one clock, and lists of dictionaries | ~75 min |
 
 ```
 ./venv/bin/python melody-jumper/jumper.py
-./venv/bin/python melody-jumper/finder.py
-./venv/bin/python melody-jumper/band.py
 ```
-
-Those three do connect to each other — lesson 2 writes a song file that lesson 1
-plays — which is explained in the [Melody Jumper README](melody-jumper/README.md).
 
 ---
 
@@ -96,8 +89,6 @@ plays — which is explained in the [Melody Jumper README](melody-jumper/README.
 |---|---|
 | **lesson1.py** | nothing to press. Pochita walks on his own. |
 | **jumper.py** | `SPACE` pause · `R` start over |
-| **band.py** | `SPACE` pause · `R` start over · `1` `2` `3` `4` mute an instrument |
-| **finder.py** | `a w s e d f t g y h u j k o l p ;` the piano · `ENTER` keep the note you just played · `SPACE` hold for a silence · `BACKSPACE` delete the last one · `Z` `X` octave down/up · `Q` drone · `TAB` play back |
 
 ---
 
@@ -157,8 +148,8 @@ everyone about four times and then never again.
 It's behind your other windows, or waiting in the Dock. Click the Python icon
 there.
 
-Problems specific to one tutorial — missing sprites, no sound, the band's slow
-start — are in that tutorial's own README:
+Problems specific to one tutorial — missing sprites, no sound, a note name it
+won't accept — are in that tutorial's own README:
 [Pochita](pochita/README.md) · [Melody Jumper](melody-jumper/README.md).
 
 ---
@@ -174,14 +165,9 @@ pochita/            tutorial 1 — animation
 
 melody-jumper/      tutorial 2 — music
   README.md
-  LESSON1.md        the ball plays the song
+  LESSON1.md
   jumper.py
-  LESSON2.md        find the notes yourself
-  finder.py
-  LESSON3.md        the band
-  band.py
-  tones.py          the sound engine, shared by all three
-  my_song.py        not there yet — finder.py creates it
+  tones.py          the sound engine
 
 requirements.txt    what to install (just pygame-ce)
 ```
@@ -205,5 +191,4 @@ Also fine.
 ## Don't commit the venv
 
 The `venv` folder is about 40 MB of downloaded library, and the setup commands
-rebuild it in seconds. It's already in `.gitignore` — leave it there. `my_song.py`
-is *not* ignored, because that one is Evolett's work and worth keeping.
+rebuild it in seconds. It's already in `.gitignore` — leave it there.

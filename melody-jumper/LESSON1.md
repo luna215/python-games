@@ -231,11 +231,10 @@ You do not need to read music. Here's the method that works:
 
 Melodies loop forever, so a good one is about 8 to 20 notes.
 
-**There's an easier way to do this, and it's the next lesson.**
-[finder.py](finder.py) turns your keyboard into a piano so you can hunt for the
-notes by ear and have it write the list for you. If typing note names into a file
-is annoying you right now, that annoyance is the reason lesson 2 exists — go and
-do [Lesson 2](LESSON2.md), then come back here and run this again.
+**If typing note names into a file starts to feel slow, that's a fair reaction.**
+Hold onto it. Working a tune out one note at a time, by hand, is exactly the kind
+of job people write programs to do for them — and that's a good thing to want
+before you know how.
 
 ---
 
@@ -303,7 +302,8 @@ note, since that sets how long the tones need to be.
 - *Where the tune came from.* The notes in `MELODY` are Grieg's, read off the
   score, not an approximation — the piece is out of copyright. If she asks why
   this one and not something current: current songs mostly don't have their
-  melodies published anywhere, which is exactly the gap lesson 2 fills.
+  melodies published anywhere you can check, so anything claiming to be one would
+  be a guess. Getting a modern song in there means working it out by ear.
 
 **If they ask how the sound is made:** every note is a list of about 60,000
 numbers, one every 1/44100th of a second, describing where a speaker cone should
@@ -316,9 +316,12 @@ what every dial does. Change one number and re-run.
 
 ---
 
-## Next lesson
+## What next
 
-[Lesson 2 — Find the notes yourself](LESSON2.md). Typing note names into a list
-is the slow way. Next lesson builds the tool that listens instead: a keyboard you
-can hunt around on until a note matches the song in your head, which then writes
-this list for you.
+That's the only Melody Jumper lesson so far. If you want more of it, the best
+thing to do is the assignment above properly: get a song you like into `MELODY`,
+even if it's only eight notes, and watch the ball play it.
+
+There's another tutorial in [pochita/](../pochita/README.md), about animation
+instead of music. It starts at its own lesson 1 and doesn't assume you've done
+this one.
