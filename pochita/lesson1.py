@@ -1,6 +1,6 @@
 """Lesson 1 — Pochita goes for a walk.
 
-    ./venv/bin/python pochita-game/lesson1.py        (from the dev-games folder)
+    ./venv/bin/python pochita/lesson1.py       (from the python-games folder)
 
 ESC or close the window to quit.
 

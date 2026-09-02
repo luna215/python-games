@@ -52,17 +52,20 @@ troubleshooting entry below.
 **Run everything from this folder**, not from inside `pochita/` or
 `melody-jumper/`.
 
-### [Pochita](pochita/) — animation
+### [Pochita](pochita/) — making a game
 
-One lesson. Pochita walks across the screen, and you find out that nothing is
-moving: there are four drawings and some arithmetic.
+Two lessons so far, building toward a game two people can play. Lesson 1 is an
+animation you watch; lesson 2 hands you the controls, which is the whole
+difference between a film and a game.
 
 | | Lesson | What it's really about | Time |
 |---|---|---|---|
 | **1** | [Pochita goes for a walk](pochita/LESSON1.md) | variables, and the fact that animation is just pictures swapped quickly | ~60 min |
+| **2** | [Pochita goes looking for bread](pochita/LESSON2.md) | input — a program that reacts instead of replaying | ~75 min |
 
 ```
 ./venv/bin/python pochita/lesson1.py
+./venv/bin/python pochita/lesson2.py
 ```
 
 ### [Melody Jumper](melody-jumper/) — music
@@ -88,6 +91,7 @@ shape of the tune.
 | | |
 |---|---|
 | **lesson1.py** | nothing to press. Pochita walks on his own. |
+| **lesson2.py** | arrow keys to move him |
 | **jumper.py** | `SPACE` pause · `R` start over |
 
 ---
@@ -157,10 +161,12 @@ won't accept — are in that tutorial's own README:
 ## What's in here
 
 ```
-pochita/            tutorial 1 — animation
+pochita/            tutorial 1 — making a game
   README.md
   LESSON1.md
   lesson1.py
+  LESSON2.md
+  lesson2.py
   sprites/          18 files of Pochita artwork
 
 melody-jumper/      tutorial 2 — music

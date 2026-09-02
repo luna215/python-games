@@ -169,13 +169,13 @@ going blurry.
 
 ---
 
-## What next
+## Next lesson
 
-That's the whole Pochita tutorial for now — one lesson, and it's the one that
-matters: a variable is a number with a name, and changing it changes what you
-see.
+[Lesson 2 — Pochita goes looking for bread](LESSON2.md). Right now he walks
+because a number says so, and you watch. Next lesson you take the controls, the
+camera swings round to look down at him from above, and he gets something to
+chase.
 
-There's a second tutorial in [melody-jumper/](../melody-jumper/README.md), about
-music instead of animation. It starts at its own lesson 1 and doesn't assume
-you've done this one, so you can go there whenever you like. The only thing the
-two share is the setup in the [README](../README.md), which you've already done.
+There's also a separate tutorial in [melody-jumper/](../melody-jumper/README.md),
+about music instead of animation. It starts at its own lesson 1 and doesn't
+assume you've done any of this one.
