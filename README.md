@@ -21,7 +21,7 @@ commands. Copy them one line at a time.
 cd path/to/python-games
 python3 -m venv venv
 ./venv/bin/pip install pygame-ce
-./venv/bin/python pochita/lesson1.py
+./venv/bin/python pochita/lesson1/lesson1.py
 ```
 
 Replace `path/to/python-games` with wherever you cloned this repo. A shortcut:
@@ -40,7 +40,7 @@ with a different file name.
 | `cd …` | move into this folder |
 | `python3 -m venv venv` | make a private Python just for this project, in a folder called `venv` |
 | `./venv/bin/pip install pygame-ce` | download **pygame**, the library that opens windows and draws things (about 11 MB) |
-| `./venv/bin/python pochita/lesson1.py` | run the program using that private Python |
+| `./venv/bin/python pochita/lesson1/lesson1.py` | run the program using that private Python |
 
 The `./venv/bin/` prefix is the part people forget — see the first
 troubleshooting entry below.
@@ -60,12 +60,12 @@ difference between a film and a game.
 
 | | Lesson | What it's really about | Time |
 |---|---|---|---|
-| **1** | [Pochita goes for a walk](pochita/LESSON1.md) | variables, and the fact that animation is just pictures swapped quickly | ~60 min |
-| **2** | [Pochita goes looking for bread](pochita/LESSON2.md) | input — a program that reacts instead of replaying | ~75 min |
+| **1** | [Pochita goes for a walk](pochita/lesson1/LESSON1.md) | variables, and the fact that animation is just pictures swapped quickly | ~60 min |
+| **2** | [Bread and jam](pochita/lesson2/LESSON2.md) | input — a program that reacts instead of replaying | ~75 min |
 
 ```
-./venv/bin/python pochita/lesson1.py
-./venv/bin/python pochita/lesson2.py
+./venv/bin/python pochita/lesson1/lesson1.py
+./venv/bin/python pochita/lesson2/lesson2.py
 ```
 
 ### [Melody Jumper](melody-jumper/) — music
@@ -91,7 +91,7 @@ shape of the tune.
 | | |
 |---|---|
 | **lesson1.py** | nothing to press. Pochita walks on his own. |
-| **lesson2.py** | arrow keys to move him |
+| **lesson2.py** | arrow keys to move him · on the finish screen, click **Play again** (or ENTER / SPACE) |
 | **jumper.py** | `SPACE` pause · `R` start over |
 
 ---
@@ -122,8 +122,8 @@ seeing what a helpful error looks like before you meet the other kind.
 
 **`ModuleNotFoundError: No module named 'pygame'`**
 
-You ran `python pochita/lesson1.py` instead of
-`./venv/bin/python pochita/lesson1.py`. Your Mac's built-in Python doesn't have
+You ran `python pochita/lesson1/lesson1.py` instead of
+`./venv/bin/python pochita/lesson1/lesson1.py`. Your Mac's built-in Python doesn't have
 pygame — only the private one in `venv` does, and the `./venv/bin/` prefix is
 what picks it.
 
@@ -163,11 +163,9 @@ won't accept — are in that tutorial's own README:
 ```
 pochita/            tutorial 1 — making a game
   README.md
-  LESSON1.md
-  lesson1.py
-  LESSON2.md
-  lesson2.py
-  sprites/          18 files of Pochita artwork
+  lesson1/          Pochita walks
+  lesson2/          you drive him, and Denji wants feeding
+  sprites/          18 files of Pochita artwork, shared by every lesson
 
 melody-jumper/      tutorial 2 — music
   README.md

@@ -9,7 +9,7 @@ swapped quickly.
 ## Run it
 
 ```
-./venv/bin/python pochita/lesson1.py
+./venv/bin/python pochita/lesson1/lesson1.py
 ```
 
 A window opens and Pochita walks across it. Press **ESC** or close the window to
@@ -34,9 +34,10 @@ times a second:
 That's the entire trick behind every animated thing you have ever seen on a
 screen. Four drawings and some arithmetic.
 
-Open the `sprites` folder and look at `pochita_left_1.png` through
-`pochita_left_4.png`. They're 45 pixels wide. Everything else is the computer
-showing them to you fast.
+Open the `sprites` folder — it's one level up from this lesson, in `pochita/`,
+because every lesson shares the same artwork — and look at `pochita_left_1.png`
+through `pochita_left_4.png`. They're 45 pixels wide. Everything else is the
+computer showing them to you fast.
 
 ---
 
@@ -110,7 +111,7 @@ direction, which is only ever right half the time.
 
 1. Delete the `return x, speed` line at the bottom of `move`.
 2. Put it back. Change `BACKGROUND` to `(246, 234, 999)`.
-3. Rename the `sprites` folder to `sprite`, run it, then rename it back.
+3. Rename the `pochita/sprites` folder to `sprite`, run it, then rename it back.
 
 Number 3 is worth doing properly. Programs depend on files being exactly where
 they expect. That message is the machinery telling you politely; most of the
@@ -171,11 +172,11 @@ going blurry.
 
 ## Next lesson
 
-[Lesson 2 — Pochita goes looking for bread](LESSON2.md). Right now he walks
-because a number says so, and you watch. Next lesson you take the controls, the
-camera swings round to look down at him from above, and he gets something to
-chase.
+[Lesson 2 — Bread and jam](../lesson2/LESSON2.md). Right now he walks because a
+number says so, and you watch. Next lesson you take the controls, the camera
+swings round to look down at him from above, and there are two things to chase —
+one of which you won't be able to reach until you work out why.
 
-There's also a separate tutorial in [melody-jumper/](../melody-jumper/README.md),
+There's also a separate tutorial in [melody-jumper/](../../melody-jumper/README.md),
 about music instead of animation. It starts at its own lesson 1 and doesn't
 assume you've done any of this one.

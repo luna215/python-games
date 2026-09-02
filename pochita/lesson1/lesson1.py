@@ -1,6 +1,6 @@
 """Lesson 1 — Pochita goes for a walk.
 
-    ./venv/bin/python pochita/lesson1.py       (from the python-games folder)
+    ./venv/bin/python pochita/lesson1/lesson1.py     (from python-games)
 
 ESC or close the window to quit.
 
@@ -66,12 +66,13 @@ HEIGHT = 500
 GROUND = 60          # how much floor to draw under him
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SPRITES = os.path.join(HERE, "sprites")
+POCHITA = os.path.dirname(HERE)                     # the folder one level up
+SPRITES = os.path.join(POCHITA, "sprites")          # every lesson shares this
 
 if not os.path.isdir(SPRITES):
     raise SystemExit(
         "\nCan't find the 'sprites' folder.\n"
-        "It should sit right next to this file.\n")
+        "It should sit in the pochita folder, one level up from this file.\n")
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
