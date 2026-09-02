@@ -98,6 +98,25 @@ if not os.path.isdir(SPRITES):
         "\nCan't find the 'sprites' folder.\n"
         "It should sit in the pochita folder, one level up from this file.\n")
 
+if not isinstance(SIZE, int) or SIZE < 1:
+    raise SystemExit(
+        "\nSIZE is %r. It has to be a whole number, 1 or more.\n"
+        "It's how many times bigger than the original drawing to make him.\n"
+        % (SIZE,))
+
+if (not isinstance(BACKGROUND, (tuple, list)) or len(BACKGROUND) != 3
+        or not all(isinstance(c, int) and 0 <= c <= 255 for c in BACKGROUND)):
+    raise SystemExit(
+        "\nBACKGROUND is %r.\n"
+        "It needs three whole numbers between 0 and 255, like (246, 234, 220)\n"
+        "— one each for red, green and blue.\n" % (BACKGROUND,))
+
+if not isinstance(REACH, (int, float)) or not 1 <= REACH <= 200:
+    raise SystemExit(
+        "\nREACH is %r. It has to be between 1 and 200.\n"
+        "Any bigger and he'd be touching a thing the moment it appeared,\n"
+        "which would hand you the whole game without you moving.\n" % (REACH,))
+
 if not isinstance(NEEDED, int) or NEEDED < 1:
     raise SystemExit(
         "\nNEEDED is %r. It has to be a whole number, 1 or more.\n"
@@ -156,21 +175,36 @@ MARGIN = 60
 
 
 def new_bread(px, py):
-    """Bread lands further along the same row Pochita is standing on."""
-    for _ in range(80):
+    """Bread lands further along the same row Pochita is standing on.
+
+    It has to land outside REACH, or he'd pick the new one up the instant it
+    appeared and keep doing that forever. If nothing far enough turns up we
+    use the furthest spot we saw.
+    """
+    far = max(260, REACH + 40)
+    best, best_gap = MARGIN, -1
+    for _ in range(120):
         bx = random.randint(MARGIN, WIDTH - MARGIN)
-        if abs(bx - px) > 260:
+        gap = abs(bx - px)
+        if gap > best_gap:
+            best, best_gap = bx, gap
+        if gap > far:
             return bx, py
-    return MARGIN, py
+    return best, py
 
 
 def new_jam(px, py):
     """Jam lands further up or down the same column Pochita is standing in."""
-    for _ in range(80):
+    far = max(170, REACH + 40)
+    best, best_gap = MARGIN, -1
+    for _ in range(120):
         jy = random.randint(MARGIN, HEIGHT - MARGIN)
-        if abs(jy - py) > 170:
+        gap = abs(jy - py)
+        if gap > best_gap:
+            best, best_gap = jy, gap
+        if gap > far:
             return px, jy
-    return px, MARGIN
+    return px, best
 
 
 def draw_bread(cx, cy, scale=1.0):
@@ -285,14 +319,24 @@ def wrap(text, a_font, max_width):
 
 
 def win_layout():
-    """Where everything on the finished-the-game screen goes."""
+    """Where everything on the finished-the-game screen goes.
+
+    A long WIN_MESSAGE pushes the picture and the button down. Past a point
+    there's no room left, so the message gets trimmed rather than shoving
+    Denji off the bottom of the window — he's the whole reward.
+    """
     lines = wrap(WIN_MESSAGE, title_font, WIDTH - 150)
+    tall = DENJI_BIG[0].get_height()
     text_top = 84
     denji_top = text_top + len(lines) * 42 + 26
     button = pygame.Rect(0, 0, 230, 60)
-    button.center = (WIDTH // 2, denji_top + DENJI_BIG[0].get_height() + 58)
-    if button.bottom > HEIGHT - 16:      # a very long message must not push
-        button.bottom = HEIGHT - 16      # the button off the bottom edge
+    button.centerx = WIDTH // 2
+    button.top = denji_top + tall + 28
+    if button.bottom > HEIGHT - 16:
+        button.bottom = HEIGHT - 16
+        denji_top = button.top - 28 - tall
+        room = max(1, (denji_top - 26 - text_top) // 42)
+        lines = lines[:room]
     return lines, text_top, denji_top, button
 
 
@@ -390,7 +434,16 @@ while running:
 
         was_x, was_y = x, y
 
-        result = move(x, y, keys)
+        try:
+            result = move(x, y, keys)
+        except NameError as problem:
+            raise SystemExit(
+                "\nmove() uses a name Python doesn't know: %s\n"
+                "\nIf you meant one of the arrow keys, it needs BOTH quotes and\n"
+                "square brackets:\n"
+                '\n    keys["up"]        not   keys[up]\n'
+                "\nAnd names have to match exactly: SPEED is not the same as speed.\n"
+                % (problem,))
         if result is None:
             raise SystemExit(
                 "\nmove() didn't hand anything back.\n"
@@ -419,8 +472,14 @@ while running:
         if not moved:
             frame = 0
 
-        got_bread = is_touching(x, y, bread_x, bread_y)
-        got_jam = is_touching(x, y, jam_x, jam_y)
+        try:
+            got_bread = is_touching(x, y, bread_x, bread_y)
+            got_jam = is_touching(x, y, jam_x, jam_y)
+        except NameError as problem:
+            raise SystemExit(
+                "\nis_touching() uses a name Python doesn't know: %s\n"
+                "\nNames have to match exactly, and the four it is handed are\n"
+                "called ax, ay, bx and by.\n" % (problem,))
         if got_bread is None or got_jam is None:
             raise SystemExit(
                 "\nis_touching() didn't hand anything back.\n"

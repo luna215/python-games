@@ -12,8 +12,8 @@ And a second number, `y`, which turns out not to work the way you'd expect.
 ./venv/bin/python pochita/lesson2/lesson2.py
 ```
 
-**Arrow keys** move him. **ESC** quits. On the finish screen, click
-**Play again** — or press ENTER or SPACE.
+**Arrow keys** move him — WASD works too. **ESC** quits. On the finish screen,
+click **Play again**, or press ENTER or SPACE.
 
 There's a piece of bread and a jar of jam. Fetch Denji **one of each** and he
 comes out and eats.
@@ -36,15 +36,15 @@ you've had a proper go at it yourself.
 In lesson 1, Pochita walked because `SPEED` said so. You could change the number
 and watch a different film, but while it was running you were a spectator.
 
-Now the machinery asks a question sixty times a second — *what is she holding
+Now the machinery asks a question sixty times a second — *what are you holding
 down right now?* — and hands your code the answer. That's the entire difference
 between an animation and a game, and it's why every game ever made has a loop
 like this one at its heart.
 
 ### The camera moved
 
-The floor is gone. Lesson 1 watched him from the side, so there was a ground
-line and he walked along it. This one looks straight down at him from above,
+The ground line is gone. Lesson 1 watched him from the side, so there was a line
+for him to walk along. This one looks straight down at him from above,
 which is why there's a whole room to move around in instead of one line.
 
 He'll still face sideways when he walks up or down — there are only drawings of
@@ -83,9 +83,9 @@ When he finally does turn up, he arrives on a see-through sheet laid over the
 game. You can still see the room faintly behind him, because he's *on top of*
 the game rather than replacing it.
 
-He's drawn out of plain shapes in the machinery — some circles, a couple of
-rectangles and five triangles for the hair. No picture files at all. Worth
-knowing, because it means you could draw anything the same way.
+He's drawn out of plain shapes in the machinery — circles, rectangles and
+triangles, and that's all. No picture files anywhere. Worth knowing, because it
+means you could draw anything the same way.
 
 ---
 
@@ -115,6 +115,11 @@ direction the jam ever appears in, which is why you've been failing to reach it.
 **Add the other two.** Same shape as the two above, using `keys["up"]` and
 `keys["down"]`, and changing `y` instead of `x`.
 
+Put them **above** the `return x, y` line. `return` means "the function stops
+here and hands this back", so anything you type underneath it never runs at all —
+and the game would behave exactly as if you hadn't typed anything, which is a
+miserable thing to debug.
+
 **Before you run it, decide which way up is.** Say your guess out loud. Then run
 it and hold the up arrow.
 
@@ -138,40 +143,48 @@ Now go and get the jam, and meet Denji.
 **1. Speed, and running straight past things.** Try `SPEED = 1`. Then `20`. Then
 push it much further than seems sensible.
 
-Here's how much bread he manages to collect in fifteen seconds of sweeping back
-and forth, averaged over ten different random layouts:
+Here's how much bread he collects in fifteen seconds of running wall to wall,
+averaged over ten random layouts:
 
 | SPEED | bread collected |
 | --- | --- |
-| 4 | 0.8 |
-| 20 | 6.2 |
-| 100 | 6.3 |
-| 120 | 5.9 |
-| **150** | **3.0** |
+| 4 | 4.7 |
+| 20 | 24.2 |
+| 60 | 71.2 |
+| 100 | 108.6 |
+| 120 | 118.1 |
+| **150** | **2.8** |
 | **200** | **1.0** |
 
-It climbs, levels off, and then *falls apart*. The first bit is obvious — a
-faster Pochita covers more ground. The collapse is the interesting part, and it
-isn't because he's too fast to steer.
+Faster is better, and better, and better — and then at 150 it doesn't just get a
+bit worse, it **falls off a cliff**. From 118 to under 3.
 
-`REACH` is 50, so the patch of floor where he can eat the bread is 100 pixels
-wide, 50 either side of it. At `SPEED = 200` he crosses 200 pixels between one
-frame and the next. He can be well to the left of the bread, and then next frame
-be well to the right of it, without ever having been close enough to eat it. He
-jumps straight over the whole window.
+And it's worse than the number makes it look. Run it at 150 and watch: he grabs a
+few pieces in the first half-second and then **never gets another one**, for as
+long as you leave it going. He isn't unlucky. He's stuck.
+
+`REACH` is 50, so he has to get within 50 pixels. At `SPEED = 150` he moves 150
+pixels between one frame and the next, so the places he can *ever* stand have
+become a coarse grid with big gaps in it — and the bread is sitting in a gap.
+Measured over thirty seconds: the closest he ever gets to that piece of bread is
+**56 pixels**. Six pixels too far, forever.
 
 Games really do have this bug, and it's called **tunnelling**. It's why a fast
-enough bullet sometimes goes through a wall.
+enough bullet sometimes goes straight through a wall.
+
+**Put `SPEED` back to 4 before the next one** — it needs the ordinary speed.
 
 **2. The diagonal is faster.** Hold `right`. Then hold `right` and `up`
 together. It *feels* quicker — and it is:
 
 | holding | distance covered in one second |
 | --- | --- |
-| right | 244 px |
-| right + up | 345 px |
+| right | about 240 px |
+| right + up | about 340 px |
 
-That's 1.41 times as far, which is √2, and it's for the plainest possible
+The exact distances wobble a little depending on how many frames your computer
+fits into a second, but the *ratio* doesn't: it is 1.4142, every time. That's √2,
+and it's for the plainest possible
 reason: you added `SPEED` to `x` and `SPEED` to `y` in the same frame, so he
 moved `SPEED` across *and* `SPEED` down, and the actual distance from corner to
 corner of that little square is longer than either side.
@@ -180,6 +193,7 @@ Almost every game you have played has had this bug at some point. Now you know
 what to look for.
 
 **3. Reach.** `REACH` is how close his middle has to get. Try `10`. Then `200`.
+Then put it back to `50` — challenge 5 below only makes sense at 50.
 
 **4. Break the touching test, and watch him cheat.** In `is_touching`, delete the
 second half so it only checks `x`:
@@ -213,9 +227,8 @@ is stuck on zero — so the bug hands you infinite jam and still no dinner.
     return ((ax - bx) ** 2 + (ay - by) ** 2) ** 0.5 < REACH
 ```
 
-That's the distance formula from maths class — the length of the diagonal of a
-right-angled triangle — and it is genuinely how games decide whether you got
-hit.
+That's the distance formula from maths class — the length of the hypotenuse of a
+right-angled triangle — and it is genuinely how games decide whether you got hit.
 
 Here's what it fixes. With `REACH = 50`:
 
@@ -235,8 +248,8 @@ the way round.
 before Denji appears. It ships at `1`. Try `5`.
 
 That one number turns a thirty-second game into a real one, and it's the whole
-change — nothing else in the file needs touching. Notice the counter in the
-corner starts reading `bread 2 / 5` and keeps track for you.
+change — nothing else in the file needs touching. The counter in the corner now
+starts at `bread 0 / 5` and keeps score as you go.
 
 **7. Change what Denji says.** `WIN_MESSAGE`, at the top. Put anything you like
 in it. If you write something long it wraps onto more lines by itself, and the
@@ -269,12 +282,15 @@ happening to you and wrote a sentence instead.
 
 **This one says nothing at all:**
 
-6. Set `REACH = 200` and stand near the middle of the room.
+6. Set `REACH = 200` and play for a bit. **Watch him, not the score.**
 
-No error. He eats things from most of the way across the floor without moving,
-because you told him his reach was 200 pixels and he believed you. The program
-is doing precisely what you asked. It's your idea of the game that's broken, and
-no error message will ever catch that.
+No error, and the score barely moves — about 5 pieces in fifteen seconds either
+way, because what slows him down is running about, not reaching. But look at what
+he's actually doing: he now snatches things from two body-lengths away, without
+ever going near them. Food leaps into him.
+
+The program is doing precisely what you asked. It's your idea of the game that's
+broken, and no error message will ever catch that — you have to *look*.
 
 ---
 
@@ -308,11 +324,14 @@ to care. If she asks, "a labelled box of values" is enough for now.
 - *Up and down go the wrong way.* Intended. See above.
 - *Diagonal feels fast.* Some students notice unprompted, which is a very good
   sign. The fix is deliberately not in this lesson — noticing is the win.
-- *Challenge 1 (tunnelling).* Note it does **not** happen at 60, or even at 120 —
-  she has to push to 150 or 200 before he starts skipping over things, and even
-  then it's a matter of where his steps land rather than a clean on/off. The
-  raggedness is the valuable part: bugs that only sometimes happen are the
-  expensive kind.
+- *Challenge 1 (tunnelling).* It does **not** happen at 60 or even 120 — those
+  are fine and get faster and faster. The cliff is between 120 and 150, and it is
+  a cliff: 118 pieces down to under 3. Have her leave it running at 150 and watch
+  him fail to collect anything for thirty seconds; the stall is far more striking
+  than the number. Measured: after the first half-second he never again gets
+  closer than 56 px to the bread, needing 50. Six pixels short, permanently.
+  Remind her to put SPEED back to 4 — challenge 2 is invisible at 150 because
+  he hits the walls within a couple of frames.
 - *Challenge 4 (601 jars while standing still).* The funniest one and the one
   that best shows why both halves of the test matter. Ask her to predict what
   will happen before she runs it — almost nobody predicts "infinite jam".
