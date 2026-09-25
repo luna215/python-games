@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pochita — Python Games</title>
+<meta name="description" content="Read what to do, write the code, run it and watch.">
+<link rel="stylesheet" href="app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🐕</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.43.2/src-min-noconflict/ace.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@16.4.1/lib/marked.umd.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="mark">Pochita <span>· python games</span></div>
+  <select id="pick" aria-label="Choose a lesson"></select>
+  <div class="spacer"></div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+</header>
+
+<main>
+
+  <section id="learn">
+    <details class="learn-head" id="about" open>
+      <summary>
+        <h1 id="lesson-title"></h1>
+        <span class="chev" aria-hidden="true">▾</span>
+      </summary>
+      <div id="summary"></div>
+    </details>
+
+    <div class="step-bar">
+      <span id="step-count"></span>
+      <div class="spacer"></div>
+      <button id="all-steps" aria-pressed="false">All steps</button>
+    </div>
+
+    <div id="step-body"></div>
+
+    <div class="step-nav">
+      <button id="prev">&lsaquo; Back</button>
+      <button id="next">Next &rsaquo;</button>
+    </div>
+  </section>
+
+  <!-- The right half is one thing at a time: the code, or the game. -->
+  <section id="right" data-mode="code">
+
+    <div class="right-bar">
+      <span class="mode-label" data-for="code">Your code</span>
+      <span class="mode-label" data-for="game">Running</span>
+
+      <div class="spacer"></div>
+
+      <span class="hint" id="boot-status">Starting Python…</span>
+      <button class="reset" id="reset">Reset</button>
+      <button class="run" id="run" disabled>▶ Run it</button>
+      <button class="back" id="back">&larr; Back to the code</button>
+    </div>
+
+    <div id="code-view">
+      <div class="code-card">
+        <div id="editor"></div>
+        <div class="card-foot">
+          <span id="hint">⌘↵</span>
+        </div>
+      </div>
+      <div id="message" role="status" aria-live="polite"></div>
+    </div>
+
+    <div id="game-view">
+      <canvas id="game" tabindex="0"></canvas>
+    </div>
+
+  </section>
+</main>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

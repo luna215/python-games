@@ -1,0 +1,457 @@
+/* app.css — the lesson on the left, and on the right either the code or the
+ * game, never both.
+ *
+ * One warm theme, matching the game's own palette, so the page reads as part
+ * of the thing it is showing rather than as a website with a game inside it.
+ */
+
+:root {
+  --paper: #f6eadc;          /* the game's own background */
+  --card: #fdf7ef;
+  --surround: #e3d4c1;
+  --edge: #ddcab3;
+  --ink: #33281f;
+  --muted: #7d6a58;
+  --chrome: #2b211c;
+  --chrome-ink: #f0e4d6;
+  --accent: #b5762c;
+  --accent-soft: #f2dcbc;
+  --expected: #8a6414;
+  --expected-bg: #fdf2dc;
+  --bad: #9c2f3f;
+  --bad-bg: #fdeced;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+  overflow: hidden;
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--surround);
+}
+
+/* ---------------------------------------------------------------- header */
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  height: 46px;
+  background: var(--chrome);
+  color: var(--chrome-ink);
+}
+
+header .mark { font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+header .mark span { opacity: 0.55; font-weight: 400; }
+header .spacer { flex: 1; }
+
+header select {
+  font: inherit;
+  font-size: 13px;
+  color: var(--chrome-ink);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 7px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+header select:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* A dot per step, filled up to wherever they've got to. */
+.progress { display: flex; gap: 5px; align-items: center; }
+
+.progress i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 0.2s;
+}
+
+.progress i.done { background: rgba(255, 255, 255, 0.5); }
+.progress i.here { background: var(--accent); transform: scale(1.35); }
+
+/* ----------------------------------------------------------------- panes */
+
+main {
+  display: grid;
+  grid-template-columns: clamp(330px, 25%, 520px) 1fr;
+  min-height: 0;
+}
+
+/* ------------------------------------------------------------ the lesson */
+
+#learn {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  min-height: 0;
+  background: var(--paper);
+  border-right: 1px solid var(--edge);
+}
+
+/* Pinned, but folded away once they're past the first step — it's the part
+ * that stops being useful the moment you've read it, and the step underneath
+ * needs the room more. */
+.learn-head { padding: 11px 18px 10px; }
+
+.learn-head summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.learn-head summary::-webkit-details-marker { display: none; }
+
+.learn-head h1 { margin: 0; font-size: 15px; line-height: 1.3; }
+
+.learn-head .chev {
+  margin-left: auto;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--muted);
+  border: 1px solid var(--edge);
+  border-radius: 5px;
+  padding: 2px 6px 3px;
+  background: var(--card);
+  transition: transform 0.15s;
+}
+
+.learn-head summary:hover .chev { background: var(--accent-soft); }
+.learn-head[open] .chev { transform: rotate(180deg); }
+
+#summary {
+  margin-top: 7px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+#summary p { margin: 0 0 6px; }
+#summary p:last-child { margin-bottom: 0; }
+
+.step-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 18px;
+  border-top: 1px solid var(--edge);
+  border-bottom: 1px solid var(--edge);
+  background: rgba(255, 255, 255, 0.45);
+  font: 700 11px/1 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.step-bar .spacer { flex: 1; }
+
+.step-bar button {
+  font: 600 10.5px/1 var(--sans);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.step-bar button:hover { background: var(--accent-soft); color: var(--ink); }
+
+.step-bar button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+#step-body {
+  overflow: auto;
+  padding: 14px 18px 18px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* macOS hides scrollbars until you scroll, so a step that runs past the
+ * bottom just looks like a sentence that stops. Fade the last line instead. */
+#step-body.more {
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+}
+
+#step-body h2 { margin: 0 0 10px; font-size: 15px; }
+
+/* In "all steps" view each heading is a way back into the stepped view. */
+#step-body.all h2 { margin-top: 22px; cursor: pointer; color: var(--accent); }
+#step-body.all h2:first-child { margin-top: 0; }
+#step-body.all h2:hover { text-decoration: underline; }
+
+#step-body.all section + section {
+  border-top: 1px solid var(--edge);
+  padding-top: 4px;
+}
+
+#step-body p { margin: 0 0 11px; }
+#step-body ul, #step-body ol { margin: 0 0 11px; padding-left: 20px; }
+#step-body li { margin-bottom: 5px; }
+
+#step-body code {
+  font: 12.5px var(--mono);
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+#step-body pre {
+  background: var(--card);
+  border: 1px solid var(--edge);
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow: auto;
+}
+
+#step-body pre code { background: none; border: 0; padding: 0; font-size: 12px; }
+
+#step-body table { border-collapse: collapse; font-size: 12px; margin: 10px 0; }
+#step-body th, #step-body td { border: 1px solid var(--edge); padding: 4px 8px; text-align: left; }
+#step-body th { background: rgba(255, 255, 255, 0.6); }
+
+#step-body blockquote {
+  margin: 12px 0;
+  padding: 8px 14px;
+  border-left: 3px solid var(--accent);
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 0 7px 7px 0;
+}
+
+.step-nav {
+  display: flex;
+  gap: 8px;
+  padding: 9px 18px;
+  border-top: 1px solid var(--edge);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.step-nav button {
+  font: 600 13px var(--sans);
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--edge);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.step-nav button:hover:not(:disabled) { background: var(--accent-soft); }
+
+.step-nav #next {
+  margin-left: auto;
+  background: var(--accent);
+  border-color: #96601f;
+  color: #fff;
+}
+
+.step-nav #next:hover:not(:disabled) { background: #c8862f; }
+.step-nav button:disabled { opacity: 0.35; cursor: default; }
+
+/* ------------------------------------------------------- the right half */
+
+/* One thing at a time. `data-mode` on #right decides which. */
+#right {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  background:
+    radial-gradient(circle at 50% 38%, #ecdfcd 0%, var(--surround) 78%);
+}
+
+.right-bar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--edge);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.right-bar .spacer { flex: 1; }
+
+.right-bar .mode-label {
+  font: 700 11px/1 var(--sans);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.right-bar .hint { font-size: 11.5px; color: var(--muted); }
+
+/* Only the controls belonging to the current mode are on screen. */
+#right[data-mode="code"] [data-for="game"],
+#right[data-mode="code"] #back,
+#right[data-mode="game"] [data-for="code"],
+#right[data-mode="game"] #run,
+#right[data-mode="game"] #reset { display: none; }
+
+#right[data-mode="code"] #game-view,
+#right[data-mode="game"] #code-view { display: none; }
+
+#right.ready #boot-status { display: none; }
+
+button.run, button.reset, button.back {
+  font: 600 13px var(--sans);
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+button.run {
+  background: var(--accent);
+  border-color: #96601f;
+  color: #fff;
+}
+
+button.run:hover:not(:disabled) { background: #c8862f; }
+
+button.reset, button.back {
+  background: var(--card);
+  border-color: var(--edge);
+  color: var(--muted);
+}
+
+button.reset:hover, button.back:hover { background: var(--accent-soft); color: var(--ink); }
+button:disabled { opacity: 0.45; cursor: default; }
+
+/* ------------------------------------------------------------- the code */
+
+#code-view {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 18px 22px 22px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The card fills the pane. Plenty of empty room below the code, but it reads
+ * as a file you're working in rather than a note pinned to a big blank wall. */
+.code-card {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+  background: var(--card);
+  border: 1px solid var(--edge);
+  border-radius: 11px;
+  box-shadow: 0 3px 14px rgba(60, 40, 20, 0.08);
+  overflow: hidden;
+}
+
+/* No font-size here on purpose — Ace sets it, from app.js, and a rule here
+ * would quietly win and throw its column measurements out. */
+#editor {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.card-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 7px 14px 8px;
+  border-top: 1px solid var(--edge);
+  background: rgba(246, 234, 220, 0.5);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+#message {
+  display: none;
+  max-height: 32vh;
+  overflow: auto;
+  padding: 12px 16px 14px;
+  border-radius: 10px;
+  font: 12.5px/1.55 var(--mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#message.show { display: block; }
+
+#message .kind {
+  display: block;
+  margin-bottom: 6px;
+  font: 700 10px/1 var(--sans);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+/* A message the lesson wrote in advance, versus one it didn't. Most of the
+ * error messages in these programs were written for the exact mistake being
+ * made, which is not true of programming in general — so they look different. */
+#message.expected {
+  color: var(--expected);
+  background: var(--expected-bg);
+  border: 1px solid #e8d09a;
+}
+
+#message.unexpected {
+  color: var(--bad);
+  background: var(--bad-bg);
+  border: 1px solid #edc2c8;
+}
+
+#message.output {
+  color: var(--muted);
+  background: var(--paper);
+  border: 1px solid var(--edge);
+}
+
+/* ------------------------------------------------------------- the game */
+
+#game-view {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#game {
+  display: block;
+  image-rendering: pixelated;
+  border-radius: 3px;
+  box-shadow: 0 6px 28px rgba(60, 40, 20, 0.22);
+  outline: none;
+}
+
+/* Something is wrong and the game has stopped where it stood. */
+#game.paused {
+  filter: saturate(0.18) brightness(0.86) contrast(0.92);
+  box-shadow: 0 6px 28px rgba(60, 40, 20, 0.12);
+}
+
+/* ------------------------------------------------------------ narrow view */
+
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 45%) minmax(0, 55%);
+  }
+
+  #learn {
+    border-right: 0;
+    border-bottom: 1px solid var(--edge);
+  }
+}

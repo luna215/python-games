@@ -1,18 +1,32 @@
 # python-games
 
-Python tutorials for Evolett. Each one opens a window with something moving in
-it, and each lesson has a card telling you what to change and what to look for.
+Python tutorials for Evolett. Each one puts something moving on the screen, and
+each lesson tells you what to change and what to look for.
 
 There are **two tutorials, and they're independent** — separate subjects, each
-starting at its own lesson 1. Do them in either order, or only one. They share
-nothing except the setup below.
-
-Everything runs on your own computer. Nothing to sign up for, no website, and
-after the one-time setup, no internet needed either.
+starting at its own lesson 1. Do them in either order, or only one.
 
 ---
 
-## Setup — you only do this once
+## Start here — in the browser
+
+### → [Open the tutorial](https://luna215.github.io/python-games/)
+
+Nothing to install and nothing to set up. The code you write is on the left, the
+game is on the right, and pressing **Run** puts your change on screen straight
+away. What you type is kept in the browser, so you can close the tab and pick it
+back up later.
+
+Both Pochita lessons are there. Melody Jumper is still terminal-only, below.
+
+---
+
+## The other way in — on your own computer
+
+Running Python yourself is worth learning, and every lesson works this way too.
+It takes four Terminal commands once, and then it's one command per lesson.
+
+### Setup — you only do this once
 
 Open **Terminal** (CMD+Space, type "Terminal", press Enter) and run these four
 commands. Copy them one line at a time.
@@ -33,7 +47,7 @@ A window should open with Pochita walking across it. **Press ESC to close it.**
 That's the whole setup. From now on, running anything is just that last line
 with a different file name.
 
-### What those four commands did
+#### What those four commands did
 
 | | |
 |---|---|
@@ -161,6 +175,10 @@ won't accept — are in that tutorial's own README:
 ## What's in here
 
 ```
+web/                the browser version — start here
+  README.md         how it works, and how it deploys
+  lessons/          one folder per lesson
+
 pochita/            tutorial 1 — making a game
   README.md
   lesson1/          Pochita walks
@@ -174,7 +192,14 @@ melody-jumper/      tutorial 2 — music
   tones.py          the sound engine
 
 requirements.txt    what to install (just pygame-ce)
+
+index.html          sends the website address to web/
+.nojekyll           tells GitHub this isn't a Jekyll site
 ```
+
+The browser version and the `.py` files teach the same lessons; neither replaces
+the other. [web/README.md](web/README.md) explains how the website is put
+together and how it gets published.
 
 `pochita/` has artwork; `melody-jumper/` has no asset files at all, because every
 note it plays is arithmetic worked out when the program starts.

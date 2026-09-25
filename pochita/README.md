@@ -13,7 +13,16 @@ other.
 
 ---
 
-## Setup
+## In the browser
+
+**→ [Both lessons, with nothing to install](https://luna215.github.io/python-games/)**
+
+What to do on the left, your code on the right, **Run it** to play. Nothing to
+install and nothing to save.
+
+---
+
+## Setup, for running them yourself
 
 If you've already run the four commands in the [main README](../README.md),
 you're done — skip to the lessons.
